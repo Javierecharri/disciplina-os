@@ -39,9 +39,9 @@ export function ScoreRing({ score, size = 176 }: ScoreRingProps) {
       </svg>
       <div className="absolute flex flex-col items-center">
         <span className="text-4xl font-semibold tabular-nums tracking-tight">
-          {score === null ? "—" : Math.round(score)}
+          {score === null ? "—" : `${Math.round(score)}%`}
         </span>
-        <span className="text-xs text-muted-foreground">/ 100</span>
+        <span className="text-xs text-muted-foreground">cumplimiento</span>
       </div>
     </div>
   );

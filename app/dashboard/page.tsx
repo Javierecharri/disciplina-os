@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDisciplineScore, type Period } from "@/hooks/useDisciplineScore";
+import { useCategoryScores } from "@/hooks/useCategoryScores";
 import { useInsights } from "@/hooks/useInsights";
 import { useAppData } from "@/hooks/useAppData";
 import { todayKey } from "@/utils/date";
@@ -31,11 +32,20 @@ const PERIOD_LABEL: Record<Period, string> = {
   all: "Todo",
 };
 
+const CATEGORY_PERIOD_OPTIONS: { value: Period; label: string }[] = [
+  { value: "today", label: "Hoy" },
+  { value: "week", label: "Semana" },
+  { value: "month", label: "Mes" },
+  { value: "year", label: "Año" },
+];
+
 export default function DashboardPage() {
   const { loading } = useAppData();
   const [period, setPeriod] = useState<Period>("week");
+  const [categoryPeriod, setCategoryPeriod] = useState<Period>("week");
   const anchor = todayKey();
   const data = useDisciplineScore(period, anchor);
+  const categoryScores = useCategoryScores(categoryPeriod, anchor);
   const insights = useInsights();
 
   if (loading) {
@@ -81,8 +91,21 @@ export default function DashboardPage() {
         <div className="lg:col-span-2">
           <HeatmapCalendar data={data.heatmap} />
         </div>
-        <CategoryBarChart data={data.categoryScores} />
-        <CategoryRadarChart data={data.categoryScores} />
+
+        <div className="flex items-center justify-between lg:col-span-2">
+          <h2 className="text-sm font-medium text-muted-foreground">Comparativa por categoría</h2>
+          <Tabs value={categoryPeriod} onValueChange={(value) => setCategoryPeriod(value as Period)}>
+            <TabsList>
+              {CATEGORY_PERIOD_OPTIONS.map((opt) => (
+                <TabsTrigger key={opt.value} value={opt.value}>
+                  {opt.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
+        <CategoryBarChart data={categoryScores} periodLabel={PERIOD_LABEL[categoryPeriod]} />
+        <CategoryRadarChart data={categoryScores} periodLabel={PERIOD_LABEL[categoryPeriod]} />
         <HabitRateList
           title="Top hábitos"
           description="Más cumplidos en el periodo"

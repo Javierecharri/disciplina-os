@@ -50,7 +50,7 @@ export function HeatmapCalendar({ data }: HeatmapCalendarProps) {
               {week.map((cell, dayIndex) => (
                 <div
                   key={cell?.date ?? `${weekIndex}-${dayIndex}`}
-                  title={cell ? `${formatDayMonth(cell.date)} — ${cell.score === null ? "sin datos" : `${Math.round(cell.score)} pts`}` : undefined}
+                  title={cell ? `${formatDayMonth(cell.date)} — ${cell.score === null ? "sin datos" : `${Math.round(cell.score)}%`}` : undefined}
                   className={`size-[11px] rounded-[2px] ${cell ? bucketClass(cell.score) : "bg-transparent"}`}
                 />
               ))}

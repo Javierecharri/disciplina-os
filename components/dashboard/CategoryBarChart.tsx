@@ -1,11 +1,12 @@
 "use client";
 
-import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, Cell, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { Category } from "@/types";
 import { ChartCard } from "./ChartCard";
 
 interface CategoryBarChartProps {
   data: { category: Category; score: number | null }[];
+  periodLabel: string;
 }
 
 function BarTooltip({ active, payload }: { active?: boolean; payload?: { payload: { name: string; score: number | null } }[] }) {
@@ -14,20 +15,27 @@ function BarTooltip({ active, payload }: { active?: boolean; payload?: { payload
   return (
     <div className="rounded-lg border border-border bg-popover px-3 py-2 text-xs shadow-md">
       <div className="font-medium">{point.name}</div>
-      <div className="text-muted-foreground">{point.score === null ? "Sin datos" : `${Math.round(point.score)} pts`}</div>
+      <div className="text-muted-foreground">{point.score === null ? "Sin datos" : `${Math.round(point.score)}%`}</div>
     </div>
   );
 }
 
-export function CategoryBarChart({ data }: CategoryBarChartProps) {
+export function CategoryBarChart({ data, periodLabel }: CategoryBarChartProps) {
   const chartData = data.map((d) => ({ name: d.category.name, score: d.score ?? 0, color: d.category.color }));
 
   return (
-    <ChartCard title="Cumplimiento por categoría" description="Periodo seleccionado">
+    <ChartCard title="Cumplimiento por categoría" description={periodLabel}>
       <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
-            <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+          <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 28, left: 0, bottom: 0 }}>
+            <XAxis
+              type="number"
+              domain={[0, 100]}
+              tickFormatter={(value: number) => `${value}%`}
+              tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+              axisLine={false}
+              tickLine={false}
+            />
             <YAxis
               type="category"
               dataKey="name"
@@ -41,6 +49,12 @@ export function CategoryBarChart({ data }: CategoryBarChartProps) {
               {chartData.map((entry) => (
                 <Cell key={entry.name} fill={entry.color} />
               ))}
+              <LabelList
+                dataKey="score"
+                position="right"
+                formatter={(value: string | number | boolean | null | undefined) => `${Math.round(Number(value ?? 0))}%`}
+                style={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+              />
             </Bar>
           </BarChart>
         </ResponsiveContainer>

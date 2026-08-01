@@ -6,13 +6,14 @@ import { ChartCard } from "./ChartCard";
 
 interface CategoryRadarChartProps {
   data: { category: Category; score: number | null }[];
+  periodLabel: string;
 }
 
-export function CategoryRadarChart({ data }: CategoryRadarChartProps) {
+export function CategoryRadarChart({ data, periodLabel }: CategoryRadarChartProps) {
   const chartData = data.map((d) => ({ name: d.category.name, score: d.score ?? 0 }));
 
   return (
-    <ChartCard title="Comparativa de categorías" description="Periodo seleccionado">
+    <ChartCard title="Comparativa de categorías" description={periodLabel}>
       <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart data={chartData} outerRadius="72%">

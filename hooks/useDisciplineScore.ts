@@ -5,7 +5,6 @@ import type { Habit } from "@/types";
 import { addDays, periodRange, previousWindow, todayKey, type Period } from "@/utils/date";
 import {
   buildLogIndex,
-  categoryScore,
   dailyScoreSeries,
   habitCompletionRate,
   periodScore,
@@ -22,7 +21,7 @@ export interface HabitRate {
 }
 
 export function useDisciplineScore(period: Period, anchor: string = todayKey()) {
-  const { habits, categories, logs } = useAppData();
+  const { habits, logs } = useAppData();
   const { settings } = useSettings();
 
   return useMemo(() => {
@@ -72,11 +71,6 @@ export function useDisciplineScore(period: Period, anchor: string = todayKey()) 
       ([date, score]) => ({ date, score }),
     );
 
-    const categoryScores = categories.map((category) => ({
-      category,
-      score: categoryScore(selectedRange.start, selectedRange.end, activeHabits, index, category.id),
-    }));
-
     const habitRates: HabitRate[] = activeHabits
       .map((habit) => ({ habit, rate: habitCompletionRate(habit, selectedRange.start, selectedRange.end, index) }))
       .filter((r): r is HabitRate => r.rate !== null);
@@ -98,11 +92,10 @@ export function useDisciplineScore(period: Period, anchor: string = todayKey()) 
       monthlyTrend,
       lineSeries,
       heatmap,
-      categoryScores,
       topHabits,
       weakHabits,
       streaks,
       globalScore,
     };
-  }, [habits, categories, logs, period, anchor, settings.streakThreshold]);
+  }, [habits, logs, period, anchor, settings.streakThreshold]);
 }

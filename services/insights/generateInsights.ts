@@ -34,8 +34,8 @@ export function generateInsights(habits: Habit[], categories: Category[], logs: 
       id: `category-momentum-${category.id}`,
       text:
         delta > 0
-          ? `La categoría ${category.name} ha subido ${Math.round(delta)} pts respecto al mes anterior.`
-          : `La categoría ${category.name} ha bajado ${Math.round(Math.abs(delta))} pts respecto al mes anterior.`,
+          ? `La categoría ${category.name} ha subido ${Math.round(delta)}% respecto al mes anterior.`
+          : `La categoría ${category.name} ha bajado ${Math.round(Math.abs(delta))}% respecto al mes anterior.`,
       tone: delta > 0 ? "positive" : "warning",
     });
   }
@@ -84,7 +84,7 @@ export function generateInsights(habits: Habit[], categories: Category[], logs: 
   if (bestCategory) {
     insights.push({
       id: `best-category-${bestCategory.category.id}`,
-      text: `La mejor categoría de este mes ha sido ${bestCategory.category.name} (${Math.round(bestCategory.score)} pts).`,
+      text: `La mejor categoría de este mes ha sido ${bestCategory.category.name} (${Math.round(bestCategory.score)}%).`,
       tone: "positive",
     });
   }

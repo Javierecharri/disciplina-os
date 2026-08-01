@@ -14,7 +14,7 @@ function ChartTooltip({ active, payload }: { active?: boolean; payload?: { paylo
   return (
     <div className="rounded-lg border border-border bg-popover px-3 py-2 text-xs shadow-md">
       <div className="font-medium">{formatDayMonth(point.date)}</div>
-      <div className="text-muted-foreground">{point.score === null ? "Sin datos" : `${Math.round(point.score)} pts`}</div>
+      <div className="text-muted-foreground">{point.score === null ? "Sin datos" : `${Math.round(point.score)}%`}</div>
     </div>
   );
 }
@@ -37,10 +37,11 @@ export function DisciplineLineChart({ data }: DisciplineLineChartProps) {
             />
             <YAxis
               domain={[0, 100]}
+              tickFormatter={(value: number) => `${value}%`}
               tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
               axisLine={false}
               tickLine={false}
-              width={28}
+              width={36}
             />
             <Tooltip content={<ChartTooltip />} />
             <Line

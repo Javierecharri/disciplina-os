@@ -15,7 +15,7 @@ function StatTile({ label, value }: { label: string; value: number | null }) {
   return (
     <div className="flex flex-col gap-0.5 rounded-lg bg-muted/50 px-3 py-2">
       <span className="text-xs text-muted-foreground">{label}</span>
-      <span className="text-lg font-semibold tabular-nums">{value === null ? "—" : Math.round(value)}</span>
+      <span className="text-lg font-semibold tabular-nums">{value === null ? "—" : `${Math.round(value)}%`}</span>
     </div>
   );
 }
@@ -37,14 +37,15 @@ export function ScoreHero({ periodLabel, score, trend, heroScores, globalScore }
               >
                 {trend >= 0 ? <TrendingUp className="size-4" /> : <TrendingDown className="size-4" />}
                 {trend >= 0 ? "+" : ""}
-                {Math.round(trend)} pts vs. periodo anterior
+                {Math.round(trend)}% vs. periodo anterior
               </span>
             )}
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+        <StatTile label="Día" value={heroScores.today} />
         <StatTile label="Semana" value={heroScores.week} />
         <StatTile label="Mes" value={heroScores.month} />
         <StatTile label="Año" value={heroScores.year} />
