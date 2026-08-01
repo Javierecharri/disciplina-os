@@ -6,6 +6,7 @@ import { addDays, periodRange, previousWindow, todayKey, type Period } from "@/u
 import {
   buildLogIndex,
   dailyScoreSeries,
+  earliestTrackedDate,
   habitCompletionRate,
   periodScore,
 } from "@/services/scoring/disciplineScore";
@@ -27,10 +28,7 @@ export function useDisciplineScore(period: Period, anchor: string = todayKey()) 
   return useMemo(() => {
     const activeHabits = habits.filter((h) => h.active);
     const index = buildLogIndex(logs);
-    const earliest = habits.reduce(
-      (min, h) => (h.createdAt.slice(0, 10) < min ? h.createdAt.slice(0, 10) : min),
-      anchor,
-    );
+    const earliest = earliestTrackedDate(habits, logs, anchor);
 
     const heroRanges = {
       today: periodRange("today", anchor, earliest),

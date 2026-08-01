@@ -31,11 +31,16 @@ function weeklyBestStatus(habit: Habit, index: LogIndex, date: string): HabitSta
   return best;
 }
 
-/** Whether `habit` contributes to the Discipline Score on `date`. */
-export function isHabitCountedOnDate(habit: Habit, date: string): boolean {
+/**
+ * Whether `habit` contributes to the Discipline Score on `date`.
+ * Days before the habit's creation date are excluded UNLESS a log already exists for that
+ * day — this lets backfilling past history work, while a plain "unset" day before creation
+ * still doesn't retroactively count as missed.
+ */
+export function isHabitCountedOnDate(habit: Habit, date: string, index: LogIndex): boolean {
   if (!habit.active) return false;
-  if (date < habit.createdAt.slice(0, 10)) return false;
   if (isFuture(date)) return false;
+  if (date < habit.createdAt.slice(0, 10) && !index.has(logKey(habit.id, date))) return false;
 
   if (habit.targetType === "daily") return true;
   if (habit.targetType === "custom") return habit.targetDays?.includes(dayOfWeek(date)) ?? false;
@@ -53,7 +58,7 @@ export function dailyScore(date: string, habits: Habit[], index: LogIndex): Weig
   let totalWeight = 0;
 
   for (const habit of habits) {
-    if (!isHabitCountedOnDate(habit, date)) continue;
+    if (!isHabitCountedOnDate(habit, date, index)) continue;
     const status = habit.targetType === "weekly" ? weeklyBestStatus(habit, index, date) : statusOn(index, habit.id, date);
     weightedSum += habit.weight * STATUS_VALUE[status];
     totalWeight += habit.weight;
@@ -98,11 +103,24 @@ export function habitCompletionRate(habit: Habit, startDate: string, endDate: st
   let occurrences = 0;
   let sum = 0;
   for (const date of dateRange(startDate, endDate)) {
-    if (!isHabitCountedOnDate(habit, date)) continue;
+    if (!isHabitCountedOnDate(habit, date, index)) continue;
     const status = habit.targetType === "weekly" ? weeklyBestStatus(habit, index, date) : statusOn(index, habit.id, date);
     occurrences += 1;
     sum += STATUS_VALUE[status];
   }
   if (occurrences === 0) return null;
   return sum / occurrences;
+}
+
+/** Earliest date with any data: the oldest habit creation date, or an earlier backfilled log, whichever comes first. */
+export function earliestTrackedDate(habits: Habit[], logs: DailyLog[], fallback: string): string {
+  let earliest = fallback;
+  for (const habit of habits) {
+    const created = habit.createdAt.slice(0, 10);
+    if (created < earliest) earliest = created;
+  }
+  for (const log of logs) {
+    if (log.date < earliest) earliest = log.date;
+  }
+  return earliest;
 }

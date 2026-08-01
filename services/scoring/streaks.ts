@@ -1,6 +1,6 @@
 import type { DailyLog, Habit } from "@/types";
 import { addDays, dateRange, todayKey } from "@/utils/date";
-import { buildLogIndex, dailyScore, isHabitCountedOnDate } from "./disciplineScore";
+import { buildLogIndex, dailyScore, earliestTrackedDate, isHabitCountedOnDate } from "./disciplineScore";
 
 /**
  * Generic streak scan over an ascending list of dates.
@@ -39,13 +39,14 @@ export interface StreakResult {
 }
 
 export function habitStreaks(habit: Habit, logs: DailyLog[], asOfDate: string = todayKey()): StreakResult {
-  const index = buildLogIndex(logs.filter((l) => l.habitId === habit.id));
-  const start = habit.createdAt.slice(0, 10);
+  const habitLogs = logs.filter((l) => l.habitId === habit.id);
+  const index = buildLogIndex(habitLogs);
+  const start = earliestTrackedDate([habit], habitLogs, asOfDate);
   if (start > asOfDate) return { current: 0, best: 0 };
   const dates = dateRange(start, asOfDate);
 
   return scanStreaks(dates, (date) => {
-    if (!isHabitCountedOnDate(habit, date)) return null;
+    if (!isHabitCountedOnDate(habit, date, index)) return null;
     return index.get(`${habit.id}__${date}`) === "completed";
   });
 }
@@ -58,8 +59,7 @@ export function disciplineStreaks(
   asOfDate: string = todayKey(),
 ): StreakResult {
   if (habits.length === 0) return { current: 0, best: 0 };
-  const earliestCreated = habits.reduce((min, h) => (h.createdAt < min ? h.createdAt : min), habits[0].createdAt);
-  const start = earliestCreated.slice(0, 10);
+  const start = earliestTrackedDate(habits, logs, asOfDate);
   if (start > asOfDate) return { current: 0, best: 0 };
 
   const index = buildLogIndex(logs);

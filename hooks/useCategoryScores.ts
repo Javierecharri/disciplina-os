@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { periodRange, todayKey, type Period } from "@/utils/date";
-import { buildLogIndex, categoryScore } from "@/services/scoring/disciplineScore";
+import { buildLogIndex, categoryScore, earliestTrackedDate } from "@/services/scoring/disciplineScore";
 import { useAppData } from "./useAppData";
 
 /** Category breakdown for an independent period — decoupled from the main Discipline Score period. */
@@ -12,10 +12,7 @@ export function useCategoryScores(period: Period, anchor: string = todayKey()) {
   return useMemo(() => {
     const activeHabits = habits.filter((h) => h.active);
     const index = buildLogIndex(logs);
-    const earliest = habits.reduce(
-      (min, h) => (h.createdAt.slice(0, 10) < min ? h.createdAt.slice(0, 10) : min),
-      anchor,
-    );
+    const earliest = earliestTrackedDate(habits, logs, anchor);
     const range = periodRange(period, anchor, earliest);
 
     return categories.map((category) => ({
