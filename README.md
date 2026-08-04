@@ -2,6 +2,10 @@
 
 Tu sistema operativo personal de disciplina. Dos pantallas, nada más: un **Habit Tracker** para registrar el día y un **Dashboard** de solo lectura que calcula tu progreso automáticamente. Pensado para usarse todos los días, durante años.
 
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/Javierecharri/disciplina-os)
+
+Pulsa el botón: Netlify te pedirá conectar tu cuenta de GitHub, creará **tu propia copia** de este repo en tu GitHub y la desplegará automáticamente. No compartes datos con nadie — cada copia guarda sus hábitos solo en el navegador de quien la usa.
+
 ## Cómo ejecutar en local
 
 Requiere Node.js 20+.
