@@ -17,6 +17,10 @@ export interface Habit {
   order: number;
   createdAt: string;
   updatedAt: string;
+  /** Show a cumulative completion KPI card for this habit on the Dashboard. */
+  pinnedKpi?: boolean;
+  /** Date (YYYY-MM-DD) the KPI counts from. Defaults to `createdAt` when unset. */
+  kpiStartDate?: string;
 }
 
 export type HabitInput = Omit<Habit, "id" | "createdAt" | "updatedAt">;

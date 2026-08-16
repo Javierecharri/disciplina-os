@@ -112,6 +112,30 @@ export function habitCompletionRate(habit: Habit, startDate: string, endDate: st
   return sum / occurrences;
 }
 
+export interface CumulativeCompletion {
+  completed: number;
+  total: number;
+  startDate: string;
+}
+
+/**
+ * Days a habit was marked "completed" out of every calendar day from its KPI start date
+ * through `endDate` (inclusive). Unlike the weighted Discipline Score, this is a plain
+ * day count — "partial" and "unset" both simply don't add to `completed`.
+ */
+export function habitCumulativeCompletion(habit: Habit, logs: DailyLog[], endDate: string): CumulativeCompletion {
+  const startDate = habit.kpiStartDate ?? habit.createdAt.slice(0, 10);
+  if (startDate > endDate) return { completed: 0, total: 0, startDate };
+
+  const index = buildLogIndex(logs.filter((l) => l.habitId === habit.id));
+  const days = dateRange(startDate, endDate);
+  let completed = 0;
+  for (const day of days) {
+    if (statusOn(index, habit.id, day) === "completed") completed += 1;
+  }
+  return { completed, total: days.length, startDate };
+}
+
 /** Earliest date with any data: the oldest habit creation date, or an earlier backfilled log, whichever comes first. */
 export function earliestTrackedDate(habits: Habit[], logs: DailyLog[], fallback: string): string {
   let earliest = fallback;

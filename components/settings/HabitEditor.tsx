@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Plus, Trash2 } from "lucide-react";
+import { Gauge, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   AlertDialog,
@@ -76,6 +77,25 @@ function HabitRowEditor({ habit }: { habit: Habit }) {
         onCheckedChange={(checked) => updateHabit(habit.id, { active: checked })}
         aria-label={habit.active ? "Desactivar hábito" : "Activar hábito"}
       />
+      <Button
+        variant="ghost"
+        size="icon"
+        className={cn("size-8", habit.pinnedKpi ? "text-primary" : "text-muted-foreground")}
+        onClick={() => updateHabit(habit.id, { pinnedKpi: !habit.pinnedKpi })}
+        aria-label={habit.pinnedKpi ? "Quitar KPI del Dashboard" : "Mostrar como KPI en el Dashboard"}
+        title="KPI en Dashboard"
+      >
+        <Gauge className="size-4" />
+      </Button>
+      {habit.pinnedKpi && (
+        <Input
+          type="date"
+          value={habit.kpiStartDate ?? habit.createdAt.slice(0, 10)}
+          onChange={(e) => updateHabit(habit.id, { kpiStartDate: e.target.value })}
+          className="h-8 w-36"
+          aria-label="Cuenta el KPI desde"
+        />
+      )}
       <AlertDialog>
         <AlertDialogTrigger
           render={

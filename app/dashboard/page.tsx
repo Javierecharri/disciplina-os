@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDisciplineScore, type Period } from "@/hooks/useDisciplineScore";
 import { useCategoryScores } from "@/hooks/useCategoryScores";
+import { useHabitKpis } from "@/hooks/useHabitKpis";
 import { useInsights } from "@/hooks/useInsights";
 import { useAppData } from "@/hooks/useAppData";
 import { todayKey } from "@/utils/date";
@@ -11,6 +12,7 @@ import { ScoreHero } from "@/components/dashboard/ScoreHero";
 import { StreakCard } from "@/components/dashboard/StreakCard";
 import { DisciplineLineChart } from "@/components/dashboard/DisciplineLineChart";
 import { HeatmapCalendar } from "@/components/dashboard/HeatmapCalendar";
+import { HabitKpiCard } from "@/components/dashboard/HabitKpiCard";
 import { CategoryBarChart } from "@/components/dashboard/CategoryBarChart";
 import { CategoryRadarChart } from "@/components/dashboard/CategoryRadarChart";
 import { HabitRateList } from "@/components/dashboard/HabitRateList";
@@ -46,6 +48,7 @@ export default function DashboardPage() {
   const anchor = todayKey();
   const data = useDisciplineScore(period, anchor);
   const categoryScores = useCategoryScores(categoryPeriod, anchor);
+  const habitKpis = useHabitKpis(anchor);
   const insights = useInsights();
 
   if (loading) {
@@ -91,6 +94,14 @@ export default function DashboardPage() {
         <div className="lg:col-span-2">
           <HeatmapCalendar data={data.heatmap} />
         </div>
+
+        {habitKpis.length > 0 && (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-2">
+            {habitKpis.map((kpi) => (
+              <HabitKpiCard key={kpi.habit.id} {...kpi} />
+            ))}
+          </div>
+        )}
 
         <div className="flex items-center justify-between lg:col-span-2">
           <h2 className="text-sm font-medium text-muted-foreground">Comparativa por categoría</h2>
